@@ -9,3 +9,4 @@ build/
 .netlify
 
 /generated/prisma
+.env
