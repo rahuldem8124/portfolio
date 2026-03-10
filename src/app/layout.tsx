@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Preloader from "@/components/Preloader";
 import ClickSound from "@/components/ClickSound";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Toaster } from "react-hot-toast"; // 1. Import this
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -29,6 +30,9 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <ClerkProvider>
+          {/* 2. Place the Toaster here */}
+          <Toaster position="bottom-right" reverseOrder={false} /> 
+          
           <Preloader />
           <ClickSound />
           <Navbar />

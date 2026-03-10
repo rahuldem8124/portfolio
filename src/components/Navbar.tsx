@@ -3,17 +3,23 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { Menu, X, Star, Skull } from "lucide-react";
+import { Menu, X, Star, Skull, ShieldCheck, Users } from "lucide-react";
 
-// ✅ COMBINED CLERK V7 IMPORTS
-import { SignInButton, UserButton, useAuth } from "@clerk/nextjs";
+// ✅ ADD useUser TO IMPORTS
+import { SignInButton, UserButton, useAuth, useUser } from "@clerk/nextjs";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   
-  // ✅ USE THE useAuth HOOK
   const { isLoaded, isSignedIn } = useAuth();
+  
+  // ✅ GET USER DATA (TO CHECK ROLE)
+  const { user } = useUser();
+
+  // Define your Admin check
+  // We check your primary email to ensure only you get the Admin link
+  const isAdmin = user?.primaryEmailAddress?.emailAddress === "rahulan23aml@srishakthi.ac.in";
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -72,17 +78,37 @@ export default function Navbar() {
               </Link>
             ))}
 
-            {/* ✅ UPDATED AUTH BUTTONS */}
+            {/* ✅ ROLE-BASED DASHBOARD LINKS */}
+            {isLoaded && isSignedIn && (
+              <div className="flex items-center gap-6">
+                {isAdmin ? (
+                  <Link 
+                    href="/dashboard" 
+                    className="flex items-center gap-2 text-[#b85c38] hover:text-[#e5d3b3] text-xs font-black uppercase tracking-tighter transition-colors"
+                  >
+                    <ShieldCheck className="w-4 h-4" />
+                    Admin Panel
+                  </Link>
+                ) : (
+                  <Link 
+                    href="/members" 
+                    className="flex items-center gap-2 text-[#e5d3b3]/70 hover:text-[#e5d3b3] text-xs font-black uppercase tracking-tighter transition-colors"
+                  >
+                    <Users className="w-4 h-4" />
+                    The Posse
+                  </Link>
+                )}
+                <UserButton />
+              </div>
+            )}
+
+            {/* AUTH BUTTON FOR LOGGED OUT USERS */}
             {isLoaded && !isSignedIn && (
-              <SignInButton mode="modal" fallbackRedirectUrl="/admin">
+              <SignInButton mode="modal" fallbackRedirectUrl="/members">
                 <button className="px-6 py-2 bg-[#b85c38] text-[#1a120b] font-black uppercase tracking-widest text-xs border-2 border-[#e5d3b3] hover:bg-[#e5d3b3] hover:text-[#b85c38] transition-all">
                   Client Portal
                 </button>
               </SignInButton>
-            )}
-
-            {isLoaded && isSignedIn && (
-              <UserButton />
             )}
           </div>
 
@@ -116,18 +142,30 @@ export default function Navbar() {
               </Link>
             ))}
 
-            {/* ✅ MOBILE AUTH */}
-            {isLoaded && !isSignedIn && (
-              <SignInButton mode="modal" fallbackRedirectUrl="/admin">
+            {/* ✅ MOBILE ROLE-BASED LINKS */}
+            {isLoaded && isSignedIn && (
+              <>
+                <Link 
+                  href={isAdmin ? "/dashboard" : "/members"} 
+                  onClick={() => setMobileOpen(false)}
+                  className="text-xl font-bold text-[#b85c38] uppercase flex items-center gap-2"
+                >
+                  {isAdmin ? <ShieldCheck /> : <Users />}
+                  {isAdmin ? "Admin Console" : "Member Area"}
+                </Link>
+                <div className="mt-4">
+                  <UserButton appearance={{ elements: { userButtonAvatarBox: "w-12 h-12" } }} />
+                </div>
+              </>
+            )}
+
+            {!isSignedIn && (
+              <SignInButton mode="modal" fallbackRedirectUrl="/members">
                 <button className="flex items-center gap-2 text-[#b85c38] font-bold uppercase border-2 border-[#b85c38] px-8 py-3">
                   <Skull className="w-4 h-4" />
                   Client Portal
                 </button>
               </SignInButton>
-            )}
-
-            {isLoaded && isSignedIn && (
-              <UserButton />
             )}
 
           </motion.div>
