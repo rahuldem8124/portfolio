@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import prisma from "@/lib/prisma";
+import { MessageSquare, Clock, CheckCircle, XCircle, User as UserIcon, Save } from "lucide-react";
 
 export default async function AdminDashboard() {
   // 1. Authenticate and verify Admin status
@@ -16,7 +17,7 @@ export default async function AdminDashboard() {
     redirect("/members");
   }
 
-  // 2. THE SERVER ACTION: Now handles both status AND adminNotes
+  // 2. THE SERVER ACTION
   async function updateRequest(formData: FormData) {
     "use server";
 
@@ -28,140 +29,167 @@ export default async function AdminDashboard() {
       where: { id },
       data: { 
         status: newStatus,
-        adminNotes: notes !== "" ? notes : null, // Saves the note, or null if left blank
+        adminNotes: notes !== "" ? notes : null,
       },
     });
 
     revalidatePath("/admin"); 
   }
 
-  // 3. Fetch all requests, including the User data via the relation
+  // 3. Fetch all requests
   const allRequests = await prisma.projectRequest.findMany({
     orderBy: { createdAt: "desc" },
     include: { user: true }, 
   });
 
+  // Calculate some quick stats for the header
+  const pendingCount = allRequests.filter(r => r.status === "PENDING").length;
+
   return (
-    <div className="min-h-screen p-8 md:p-16 max-w-7xl mx-auto text-[#1a120b]">
-      <header className="mb-10 border-b border-gray-300 pb-4">
-        <h1 className="text-4xl font-bold font-serif mb-2">Command Center</h1>
-        <p className="text-gray-600">
-          Reviewing all incoming digital bounties and project requests.
-        </p>
+    <main className="min-h-screen bg-[#06080F] text-[#e5d3b3] font-serif overflow-x-hidden pb-20">
+      
+      {/* 4. The Header (Matching the screenshot) */}
+      <header className="px-8 py-12 md:px-16 border-b border-[#1E293B] relative">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <h1 className="text-5xl md:text-6xl font-bold text-[#3B82F6] tracking-wider mb-4 uppercase">
+              Command Center
+            </h1>
+            <div className="text-[10px] md:text-xs font-mono uppercase tracking-[0.3em] text-[#64748B]">
+              Admin: {dbUser.email} • System Online
+            </div>
+          </div>
+          
+          {/* Optional Stats Display */}
+          <div className="flex gap-4 font-mono text-center">
+             <div className="bg-[#0B101E] border border-[#1E293B] rounded p-4 min-w-[100px]">
+               <div className="text-[10px] uppercase tracking-widest text-[#64748B] mb-2">Pending</div>
+               <div className="text-2xl font-bold text-[#F59E0B]">{pendingCount}</div>
+             </div>
+             <div className="bg-[#0B101E] border border-[#1E293B] rounded p-4 min-w-[100px]">
+               <div className="text-[10px] uppercase tracking-widest text-[#64748B] mb-2">Total</div>
+               <div className="text-2xl font-bold text-[#3B82F6]">{allRequests.length}</div>
+             </div>
+          </div>
+        </div>
       </header>
 
-      {/* 4. The Data Table */}
-      <div className="overflow-x-auto bg-white border border-gray-300 shadow-sm rounded-lg">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-gray-100 border-b border-gray-300">
-              <th className="p-4 font-semibold text-sm uppercase tracking-wider">Date & User</th>
-              <th className="p-4 font-semibold text-sm uppercase tracking-wider">Request Details</th>
-              <th className="p-4 font-semibold text-sm uppercase tracking-wider">Status</th>
-              <th className="p-4 font-semibold text-sm uppercase tracking-wider">Actions & Notes</th>
-            </tr>
-          </thead>
-          <tbody>
-            {allRequests.length === 0 ? (
-              <tr>
-                <td colSpan={4} className="p-8 text-center text-gray-500 italic">
-                  No project requests found in the database.
-                </td>
-              </tr>
-            ) : (
-              allRequests.map((request) => (
-                <tr key={request.id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
-                  <td className="p-4 whitespace-nowrap align-top">
-                    <div className="text-sm font-bold">{new Date(request.createdAt).toLocaleDateString()}</div>
-                    <div className="text-xs text-gray-500 mt-1">{request.user.email}</div>
-                  </td>
-                  <td className="p-4 align-top">
-                    <div className="font-bold mb-1">{request.title}</div>
-                    <div className="text-sm text-gray-600 line-clamp-3">
-                      {request.description}
-                    </div>
-                  </td>
-                  <td className="p-4 align-top">
+      {/* 5. The Content */}
+      <div className="px-8 py-12 md:px-16 max-w-6xl mx-auto">
+        <div className="flex items-center gap-3 mb-8 border-b border-[#1E293B] pb-4">
+          <MessageSquare className="text-[#3B82F6] w-5 h-5" />
+          <h2 className="text-xl font-bold text-white tracking-widest uppercase">Incoming Dispatches</h2>
+        </div>
+
+        <div className="space-y-8">
+          {allRequests.length === 0 ? (
+            <div className="py-20 border border-dashed border-[#1E293B] rounded-xl text-center">
+              <p className="text-sm font-mono tracking-widest uppercase text-[#64748B]">No dispatches detected.</p>
+            </div>
+          ) : (
+            allRequests.map((request) => (
+              <div 
+                key={request.id} 
+                className="bg-[#0B101E] border border-[#1E293B] rounded-2xl p-6 md:p-8 shadow-2xl transition-all hover:border-[#3B82F6]/30"
+              >
+                {/* Card Header */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                  <div className="flex items-center gap-4">
                     <span
-                      className={`px-3 py-1 text-xs font-bold uppercase tracking-wide rounded-full border inline-block ${
+                      className={`px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded border ${
                         request.status === "COMPLETED"
-                          ? "bg-green-100 text-green-800 border-green-300"
+                          ? "bg-green-950/40 text-green-400 border-green-500/30"
                           : request.status === "IN_PROGRESS"
-                          ? "bg-blue-100 text-blue-800 border-blue-300"
+                          ? "bg-blue-950/40 text-blue-400 border-blue-500/30"
                           : request.status === "REJECTED"
-                          ? "bg-red-100 text-red-800 border-red-300"
-                          : "bg-yellow-100 text-yellow-800 border-yellow-300"
+                          ? "bg-red-950/40 text-red-400 border-red-500/30"
+                          : "bg-yellow-950/40 text-yellow-400 border-yellow-500/30"
                       }`}
                     >
                       {request.status.replace("_", " ")}
                     </span>
-                  </td>
-                  <td className="p-4 align-top w-64">
-                    {/* The Action Buttons & Notes Form */}
-                    <form action={updateRequest} className="flex flex-col gap-2">
-                      <input type="hidden" name="id" value={request.id} />
-                      
-                      {/* Admin Notes Input */}
-                      <textarea 
-                        name="adminNotes"
-                        defaultValue={request.adminNotes || ""}
-                        placeholder="Add a reason or note..."
-                        className="w-full p-2 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 bg-gray-50 resize-none"
-                        rows={2}
-                      />
+                    <span className="text-[10px] font-mono text-[#64748B]">
+                      ID: {request.id.slice(0, 8)}
+                    </span>
+                  </div>
+                  <div className="text-[10px] font-mono uppercase tracking-widest text-[#64748B] text-left md:text-right">
+                    <div className="mb-1">Received</div>
+                    <div className="text-white/60">{new Date(request.createdAt).toLocaleDateString()}</div>
+                  </div>
+                </div>
 
-                      <div className="flex flex-wrap gap-2 mt-1">
-                        {/* Always allow saving notes without changing the actual status by submitting current status */}
-                        <button
-                          type="submit"
-                          name="status"
-                          value={request.status}
-                          className="px-3 py-1 bg-gray-200 text-gray-700 text-xs font-bold rounded hover:bg-gray-300 transition-colors"
-                        >
-                          Save Note
-                        </button>
+                {/* Card Body */}
+                <h3 className="text-2xl md:text-3xl font-bold text-[#3B82F6] mb-3">{request.title}</h3>
+                
+                <div className="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-[#64748B] mb-8">
+                  <UserIcon className="w-3 h-3" />
+                  {request.user.name || "Outlaw"} • {request.user.email}
+                </div>
 
-                        {request.status !== "IN_PROGRESS" && request.status !== "COMPLETED" && (
-                          <button
-                            type="submit"
-                            name="status"
-                            value="IN_PROGRESS"
-                            className="px-3 py-1 bg-[#1a120b] text-[#f5f5f5] text-xs font-bold rounded hover:bg-blue-700 transition-colors"
-                          >
-                            Start
-                          </button>
-                        )}
+                <p className="text-sm leading-relaxed text-[#94A3B8] mb-8 font-sans">
+                  {request.description}
+                </p>
 
-                        {request.status === "IN_PROGRESS" && (
-                          <button
-                            type="submit"
-                            name="status"
-                            value="COMPLETED"
-                            className="px-3 py-1 bg-green-600 text-white text-xs font-bold rounded hover:bg-green-700 transition-colors"
-                          >
-                            Complete
-                          </button>
-                        )}
-                        
-                        {request.status !== "REJECTED" && (
-                          <button
-                            type="submit"
-                            name="status"
-                            value="REJECTED"
-                            className="px-3 py-1 bg-white text-[#1a120b] border border-gray-300 text-xs font-bold rounded hover:bg-red-50 hover:text-red-700 transition-colors"
-                          >
-                            Reject
-                          </button>
-                        )}
-                      </div>
-                    </form>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+                {/* The Action Form */}
+                <form action={updateRequest} className="border-t border-[#1E293B] pt-6">
+                  <input type="hidden" name="id" value={request.id} />
+                  
+                  <textarea 
+                    name="adminNotes"
+                    defaultValue={request.adminNotes || ""}
+                    placeholder="Add frontier feedback..."
+                    className="w-full bg-[#05060A] border border-[#1E293B] rounded-xl p-4 text-sm font-sans text-white focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6] outline-none transition-all resize-none mb-6 min-h-[100px]"
+                  />
+
+                  <div className="flex flex-wrap gap-3">
+                    <button
+                      type="submit"
+                      name="status"
+                      value={request.status}
+                      className="flex items-center gap-2 px-4 py-2 bg-transparent text-[#94A3B8] border border-[#1E293B] text-[10px] font-black uppercase tracking-widest rounded hover:bg-[#1E293B] transition-colors"
+                    >
+                      <Save className="w-3 h-3" /> Save Note
+                    </button>
+
+                    {request.status !== "IN_PROGRESS" && request.status !== "COMPLETED" && (
+                      <button
+                        type="submit"
+                        name="status"
+                        value="IN_PROGRESS"
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-950/30 text-blue-400 border border-blue-500/30 text-[10px] font-black uppercase tracking-widest rounded hover:bg-blue-900/50 transition-colors"
+                      >
+                        <Clock className="w-3 h-3" /> In Progress
+                      </button>
+                    )}
+
+                    {request.status === "IN_PROGRESS" && (
+                      <button
+                        type="submit"
+                        name="status"
+                        value="COMPLETED"
+                        className="flex items-center gap-2 px-4 py-2 bg-green-950/30 text-green-400 border border-green-500/30 text-[10px] font-black uppercase tracking-widest rounded hover:bg-green-900/50 transition-colors"
+                      >
+                        <CheckCircle className="w-3 h-3" /> Complete
+                      </button>
+                    )}
+                    
+                    {request.status !== "REJECTED" && (
+                      <button
+                        type="submit"
+                        name="status"
+                        value="REJECTED"
+                        className="flex items-center gap-2 px-4 py-2 bg-red-950/30 text-red-400 border border-red-500/30 text-[10px] font-black uppercase tracking-widest rounded hover:bg-red-900/50 transition-colors"
+                      >
+                        <XCircle className="w-3 h-3" /> Reject
+                      </button>
+                    )}
+                  </div>
+                </form>
+              </div>
+            ))
+          )}
+        </div>
       </div>
-    </div>
+    </main>
   );
 }
