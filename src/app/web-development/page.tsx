@@ -1,19 +1,42 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, X } from "lucide-react";
 import Link from "next/link";
 
 export default function WebDevProjectPage() {
   const [mounted, setMounted] = useState(false);
+  // State to keep track of the image currently selected for full-screen view
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  // STEP 1: Fix Hydration Error by waiting for client-side mount
+  // REMOVED basePath logic to fix local development.
+  // Standard root paths (/1.png) will be used below.
+
+  // Fix Hydration Error
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Return null until the browser is ready to prevent the red error screen
+  // Handle closing the modal with the Escape key and locking body scroll
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSelectedImage(null);
+      }
+    };
+    if (selectedImage) {
+      window.addEventListener("keydown", handleKeyDown);
+      // Prevent scrolling background when modal is open
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      // Re-enable scrolling
+      document.body.style.overflow = 'unset';
+    }
+  }, [selectedImage]);
+
   if (!mounted) return null;
 
   return (
@@ -21,6 +44,44 @@ export default function WebDevProjectPage() {
       {/* VINTAGE GRAIN OVERLAY */}
       <div className="old-film-overlay opacity-10 absolute inset-0 pointer-events-none fixed" />
       <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_100px_rgba(0,0,0,0.1)] fixed" />
+
+      {/* Full-Screen Image Modal */}
+      <AnimatePresence>
+        {selectedImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            // Close modal when clicking on the background backdrop
+            onClick={() => setSelectedImage(null)}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm cursor-zoom-out"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="relative max-w-7xl w-full h-full flex items-center justify-center"
+              // Prevent clicks on the image container itself from closing the modal
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setSelectedImage(null)}
+                className="absolute top-0 right-0 md:-right-10 text-[#e5d3b3] hover:text-[#b85c38] transition-colors p-2 bg-[#1a120b] rounded-full border border-[#b85c38] z-10"
+                aria-label="Close full screen view"
+              >
+                <X className="w-6 h-6" />
+              </button>
+              {/* The expanded image gets its source directly from the state */}
+              <img
+                src={selectedImage}
+                alt="Full screen view"
+                className="w-auto h-auto max-w-full max-h-[90vh] object-contain border-4 border-[#b85c38] shadow-[0_0_50px_rgba(0,0,0,0.5)] bg-[#1a120b]"
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="max-w-6xl mx-auto relative z-10">
         
@@ -56,6 +117,7 @@ export default function WebDevProjectPage() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           className="bg-[#e8e2d5] border-4 border-[#1a120b] p-8 md:p-12 shadow-2xl relative mb-20"
+          // Reverted to standard external URL string literal
           style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/paper-fibers.png')" }}
         >
           <div className="absolute top-4 right-4 text-[#b85c38] font-mono text-[10px] uppercase font-bold">Case_File: SECUSCAN_08124</div>
@@ -71,26 +133,45 @@ export default function WebDevProjectPage() {
                 </p>
               </div>
 
-              {/* DASHBOARD IMAGES: Ensure files are moved to the root /public folder */}
+              {/* DASHBOARD IMAGES - Clickable for expansion */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-[#1a120b] p-2 border-2 border-[#b85c38] shadow-xl group overflow-hidden">
-                  {/* Updated path includes repository name */}
+                
+                {/* Image 1 */}
+                <motion.div 
+                  className="bg-[#1a120b] p-2 border-2 border-[#b85c38] shadow-xl group overflow-hidden cursor-zoom-in relative"
+                  // REVERTED TO STANDARD LOCAL PATH
+                  onClick={() => setSelectedImage("/1.png")}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="absolute inset-0 bg-[#b85c38]/0 transition-colors group-hover:bg-[#b85c38]/10 z-10 pointer-events-none" aria-hidden="true"></div>
+                  {/* REVERTED TO STANDARD LOCAL PATH */}
                   <img 
-                    src="/new/1.png"
+                    src="/1.png"
                     alt="Security Overview"
-                    className="w-full h-auto grayscale group-hover:grayscale-0 transition-all duration-700"
+                    className="w-full h-auto grayscale group-hover:grayscale-0 transition-all duration-700 relative z-0"
                   />
                   <p className="text-[9px] text-[#e5d3b3] mt-2 text-center uppercase tracking-[0.4em] opacity-50 font-mono">Real-time Fraud Monitoring Dashboard</p>
-                </div>
-                <div className="bg-[#1a120b] p-2 border-2 border-[#b85c38] shadow-xl group overflow-hidden">
-                  {/* Updated path includes repository name */}
+                </motion.div>
+
+                {/* Image 2 */}
+                <motion.div 
+                  className="bg-[#1a120b] p-2 border-2 border-[#b85c38] shadow-xl group overflow-hidden cursor-zoom-in relative"
+                   // REVERTED TO STANDARD LOCAL PATH
+                  onClick={() => setSelectedImage("/2.png")}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                   <div className="absolute inset-0 bg-[#b85c38]/0 transition-colors group-hover:bg-[#b85c38]/10 z-10 pointer-events-none" aria-hidden="true"></div>
+                   {/* REVERTED TO STANDARD LOCAL PATH */}
                   <img
-                    src="/new/2.png"
+                    src="/2.png"
                     alt="Recent Transactions"
-                    className="w-full h-auto grayscale group-hover:grayscale-0 transition-all duration-700"
+                    className="w-full h-auto grayscale group-hover:grayscale-0 transition-all duration-700 relative z-0"
                   />
                   <p className="text-[9px] text-[#e5d3b3] mt-2 text-center uppercase tracking-[0.4em] opacity-50 font-mono">Transaction Risk Scoring Feed</p>
-                </div>
+                </motion.div>
+
               </div>
 
               {/* TECHNOLOGY STACK */}
@@ -148,12 +229,14 @@ export default function WebDevProjectPage() {
             <h2 className="text-4xl font-black font-serif italic mb-2 uppercase">Need a New Frontier?</h2>
             <p className="text-[#b85c38] tracking-widest uppercase text-xs font-bold">We build interfaces that don't break.</p>
           </div>
+          {/* LINK REDIRECTS TO LOGIN - Standard local path */}
           <Link 
-            href="/#contact" 
+            href="/login" 
             className="relative z-10 inline-block px-10 py-4 bg-[#e5d3b3] text-[#1a120b] font-black uppercase tracking-widest hover:bg-[#b85c38] hover:text-[#f5f5f5] transition-all duration-300 shadow-[0_0_30px_rgba(229,211,179,0.2)]"
           >
             Start Project
           </Link>
+          {/* Reverted to standard external URL string literal */}
           <div className="absolute inset-0 opacity-5 mix-blend-overlay" style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/black-scales.png')" }} />
         </div>
       </div>
