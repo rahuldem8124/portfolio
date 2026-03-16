@@ -6,6 +6,7 @@ import Preloader from "@/components/Preloader";
 import ClickSound from "@/components/ClickSound";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "react-hot-toast";
+import { GoogleAnalytics } from '@next/third-parties/google';
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -20,20 +21,18 @@ export const metadata: Metadata = {
     default: "NOTHING | Digital Bounty Hunters",
     template: "%s | NOTHING", 
   },
-  description: "The digital frontier for high-end AI tools, NLP solutions, and Full-Stack Web Development. Wrangling code for the modern age.",
+  description: "Freelance web development and AI solutions. Wrangling Next.js, NLP, and Computer Vision for the modern digital frontier.",
   keywords: [
-    "Rahul", 
-    "AI Developer India", 
-    "Full Stack Web Developer", 
-    "NLP Specialist", 
+    "Freelance Web Developer", 
+    "AI Specialist", 
     "Next.js Portfolio", 
-    "Software Engineer Portfolio",
+    "Rahul", 
+    "Coimbatore Developer",
     "Digital Bounty Hunter"
   ],
   authors: [{ name: "Rahul" }],
   creator: "Rahul",
   
-  // Social Media Previews (Open Graph)
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -43,23 +42,19 @@ export const metadata: Metadata = {
     siteName: "NOTHING",
     images: [
       {
-        url: "/og-image.png", // Ensure this exists in your public folder!
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "NOTHING Digital Bounty Hunters",
       },
     ],
   },
-
-  // Twitter/X Card
   twitter: {
     card: "summary_large_image",
     title: "NOTHING | Digital Bounty Hunters",
     description: "Wrangling AI & Web Solutions for the modern frontier.",
     images: ["/og-image.png"],
   },
-
-  // Search Engine Bot Instructions
   robots: {
     index: true,
     follow: true,
@@ -81,7 +76,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={`scroll-smooth ${playfair.variable}`}>
       <head>
-        {/* Canonical URL helps prevent duplicate content issues in Google */}
         <link rel="canonical" href="https://portfolio-rahul-an.vercel.app" />
       </head>
       <body
@@ -89,15 +83,15 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <ClerkProvider>
-          {/* Toast notifications for user feedback */}
           <Toaster position="bottom-right" reverseOrder={false} /> 
-          
           <Preloader />
           <ClickSound />
           <Navbar />
-          
           <main>{children}</main>
         </ClerkProvider>
+
+        {/* ✅ GOOGLE ANALYTICS - Replace G-XXXXXXXXXX with your real ID */}
+        <GoogleAnalytics gaId="G-XXXXXXXXXX" /> 
       </body>
     </html>
   );

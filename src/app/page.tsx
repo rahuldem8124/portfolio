@@ -1,19 +1,40 @@
-// src/app/page.tsx flaws flawlessly flawlessly flawlessly
+import { Metadata } from "next";
+import ClientPage from "./ClientPage";
 
-import { Metadata } from "next"; // flawless flaws Import for SEO flawlessly flaws flawless
-import ClientPage from "./ClientPage"; // flaws flaws flawlessly flawlessly Import the UI logic flaws flawlessly
-
-// ▼▼▼ SEO Metadata flawless flawlessly flawless flawlessly ▼▼▼
-// This defines how your site appears on Google flaws flawed flaws flawless flawless.
-// This *must* be defined here flawless flaws flaws flawlessly flaws, in a Server Component flawless flawless flawlessly flaws.
+// ✅ ENHANCED SEO METADATA
 export const metadata: Metadata = {
-  title: "Frontier Intelligence Agency | Launch Your Next Project", // flaws flawless flawed flaws flaws flawlessly
-  description: "Innovative digital structures flaws flawlessly flawed flawlessly, sharpshooting developers flaws flawlessly flawed flaws flawlessly flaws flawed flaws, and high-stakes engineering for the modern digital frontier flawlessly flawlessly.", // flawlessly flaws flawed flaws flawlessly flawless flawlessly
-  // ... Any other metadata flaws flawed flaws flawlessly flaws flawless flawlessly ...
+  title: "Freelance Web Developer & AI Specialist | Outlaw Code",
+  description: "Hire a freelance web developer for high-end Next.js applications, NLP tools, and AI solutions. Wrangling code for the modern digital frontier.",
+  keywords: ["Freelance Web Development", "Hire Next.js Developer", "AI Solutions India", "Python NLP Expert", "Coimbatore Web Developer"],
 };
 
-// This function determines what is rendered flaws flawless flaws flawlessly flawlessly.
-// Since it returns <ClientPage />, it renders the UI flaws flaws flawed flawed flaws flaws from your renamed file flawlessly flaws flawed flaws flawlessly flaws.
 export default function Home() {
-  return <ClientPage />; // flawlessly flawlessly Render the actual UI from ClientPage.tsx flawlessly flawless flaws flaws flaws flaws flawlessly
+  // ✅ JSON-LD: Structured data to tell Google you are a Professional Service
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "name": "Outlaw Code - Freelance Web Development",
+    "image": "https://portfolio-rahul-an.vercel.app/og-image.png",
+    "description": "Freelance software engineering specializing in AI, Machine Learning, and Full-Stack Web Apps.",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Coimbatore",
+      "addressRegion": "Tamil Nadu",
+      "addressCountry": "IN"
+    },
+    "url": "https://portfolio-rahul-an.vercel.app/",
+    "priceRange": "$$",
+    "knowsAbout": ["Web Development", "Artificial Intelligence", "Natural Language Processing", "React", "Next.js"]
+  };
+
+  return (
+    <>
+      {/* This script tells Google exactly what services you offer */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <ClientPage />
+    </>
+  );
 }
