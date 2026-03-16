@@ -91,7 +91,7 @@ export default function RootLayout({
         </ClerkProvider>
 
         {/* ✅ GOOGLE ANALYTICS - Replace G-XXXXXXXXXX with your real ID */}
-        <GoogleAnalytics gaId="G-XXXXXXXXXX" /> 
+        <GoogleAnalytics gaId="G-4FJ0D89RHC" /> 
       </body>
     </html>
   );
