@@ -9,16 +9,14 @@
 }
 
 /* 🔫 UNIVERSAL REVOLVER CURSOR */
-/* The '*' selector targets EVERY element on the page. */
-/* '!important' forces it to override text inputs and pointer links. */
 html, body, * {
   cursor: url('/revolver.png') 16 16, auto !important;
 }
 
 body {
   background-color: var(--background);
-  /* Grainier, darker paper texture */
-  background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+  /* ✅ CHANGED: Pointing to local optimized asset */
+  background-image: url("/patterns/natural-paper.webp");
   color: var(--foreground);
   font-family: 'Courier New', Courier, monospace;
 }
@@ -37,7 +35,8 @@ body {
   z-index: 40;
   background: 
     radial-gradient(circle, transparent 20%, rgba(43, 29, 21, 0.5) 100%),
-    url('https://www.transparenttextures.com/patterns/stardust.png');
+    /* ✅ CHANGED: Pointing to local optimized asset */
+    url('/patterns/stardust.webp');
   mix-blend-mode: multiply;
   animation: flicker 0.1s infinite;
 }

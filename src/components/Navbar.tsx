@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { Menu, X, Star, Skull, ShieldCheck, Users } from "lucide-react";
+import { Menu, X, Star, ShieldCheck, Users, Skull } from "lucide-react";
 
-// ✅ ADD useUser TO IMPORTS
+// Clerk Imports
 import { SignInButton, UserButton, useAuth, useUser } from "@clerk/nextjs";
 
 export default function Navbar() {
@@ -13,12 +13,9 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   
   const { isLoaded, isSignedIn } = useAuth();
-  
-  // ✅ GET USER DATA (TO CHECK ROLE)
   const { user } = useUser();
 
-  // Define your Admin check
-  // We check your primary email to ensure only you get the Admin link
+  // Admin Check
   const isAdmin = user?.primaryEmailAddress?.emailAddress === "rahulan23aml@srishakthi.ac.in";
 
   useEffect(() => {
@@ -48,13 +45,13 @@ export default function Navbar() {
       >
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
 
-          {/* LOGO */}
-          <Link href="/" className="flex items-center gap-3 group">
+          {/* LOGO - Added aria-label for SEO/Accessibility */}
+          <Link href="/" className="flex items-center gap-3 group" aria-label="Outlaw Code Home">
             <div className="relative p-2 bg-[#b85c38] rounded-full border-2 border-[#e5d3b3] group-hover:rotate-12 transition-transform duration-300">
-              <Star className="w-6 h-6 text-[#1a120b] fill-current" />
+              <Star className="w-6 h-6 text-[#1a120b] fill-current" aria-hidden="true" />
             </div>
             <div className="flex flex-col">
-              <span className="text-2xl font-black font-serif italic text-[#e5d3b3] uppercase">
+              <span className="text-2xl font-black font-serif italic text-[#e5d3b3] uppercase leading-none">
                 Outlaw
               </span>
               <span className="text-[10px] font-bold tracking-[0.4em] text-[#b85c38] uppercase">
@@ -74,11 +71,11 @@ export default function Navbar() {
                 <span className="relative z-10 group-hover:text-[#1a120b] transition-colors duration-300">
                   {link.name}
                 </span>
-                <span className="absolute inset-0 bg-[#e5d3b3] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left -z-0" />
+                <span className="absolute inset-0 bg-[#e5d3b3] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left -z-0" aria-hidden="true" />
               </Link>
             ))}
 
-            {/* ✅ ROLE-BASED DASHBOARD LINKS */}
+            {/* DASHBOARD LINKS */}
             {isLoaded && isSignedIn && (
               <div className="flex items-center gap-6">
                 {isAdmin ? (
@@ -86,7 +83,7 @@ export default function Navbar() {
                     href="/dashboard" 
                     className="flex items-center gap-2 text-[#b85c38] hover:text-[#e5d3b3] text-xs font-black uppercase tracking-tighter transition-colors"
                   >
-                    <ShieldCheck className="w-4 h-4" />
+                    <ShieldCheck className="w-4 h-4" aria-hidden="true" />
                     Admin Panel
                   </Link>
                 ) : (
@@ -94,7 +91,7 @@ export default function Navbar() {
                     href="/members" 
                     className="flex items-center gap-2 text-[#e5d3b3]/70 hover:text-[#e5d3b3] text-xs font-black uppercase tracking-tighter transition-colors"
                   >
-                    <Users className="w-4 h-4" />
+                    <Users className="w-4 h-4" aria-hidden="true" />
                     The Posse
                   </Link>
                 )}
@@ -102,22 +99,28 @@ export default function Navbar() {
               </div>
             )}
 
-            {/* AUTH BUTTON FOR LOGGED OUT USERS */}
+            {/* AUTH BUTTON */}
             {isLoaded && !isSignedIn && (
               <SignInButton mode="modal" fallbackRedirectUrl="/members">
-                <button className="px-6 py-2 bg-[#b85c38] text-[#1a120b] font-black uppercase tracking-widest text-xs border-2 border-[#e5d3b3] hover:bg-[#e5d3b3] hover:text-[#b85c38] transition-all">
+                <button className="px-6 py-2 bg-[#b85c38] text-[#1a120b] font-black uppercase tracking-widest text-xs border-2 border-[#e5d3b3] hover:bg-[#e5d3b3] hover:text-[#b85c38] transition-all focus:ring-2 focus:ring-[#b85c38] outline-none">
                   Client Portal
                 </button>
               </SignInButton>
             )}
           </div>
 
-          {/* MOBILE MENU BUTTON */}
+          {/* MOBILE MENU BUTTON - Optimized for Accessibility Score */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden text-[#e5d3b3] p-2 border border-[#e5d3b3]/30 rounded-md"
+            aria-label={mobileOpen ? "Close main menu" : "Open main menu"}
+            aria-expanded={mobileOpen}
+            className="md:hidden text-[#e5d3b3] p-2 border border-[#e5d3b3]/30 rounded-md focus:outline-none focus:ring-2 focus:ring-[#b85c38] transition-colors"
           >
-            {mobileOpen ? <X /> : <Menu />}
+            {mobileOpen ? (
+              <X className="w-6 h-6" aria-hidden="true" />
+            ) : (
+              <Menu className="w-6 h-6" aria-hidden="true" />
+            )}
           </button>
         </div>
       </motion.nav>
@@ -136,13 +139,12 @@ export default function Navbar() {
                 key={i}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
-                className="text-3xl font-black font-serif italic text-[#e5d3b3] uppercase"
+                className="text-3xl font-black font-serif italic text-[#e5d3b3] uppercase hover:text-[#b85c38] transition-colors"
               >
                 {link.name}
               </Link>
             ))}
 
-            {/* ✅ MOBILE ROLE-BASED LINKS */}
             {isLoaded && isSignedIn && (
               <>
                 <Link 
@@ -150,24 +152,26 @@ export default function Navbar() {
                   onClick={() => setMobileOpen(false)}
                   className="text-xl font-bold text-[#b85c38] uppercase flex items-center gap-2"
                 >
-                  {isAdmin ? <ShieldCheck /> : <Users />}
+                  {isAdmin ? <ShieldCheck aria-hidden="true" /> : <Users aria-hidden="true" />}
                   {isAdmin ? "Admin Console" : "Member Area"}
                 </Link>
                 <div className="mt-4">
-                  <UserButton appearance={{ elements: { userButtonAvatarBox: "w-12 h-12" } }} />
+                  <UserButton appearance={{ elements: { userButtonAvatarBox: "w-14 h-14" } }} />
                 </div>
               </>
             )}
 
             {!isSignedIn && (
               <SignInButton mode="modal" fallbackRedirectUrl="/members">
-                <button className="flex items-center gap-2 text-[#b85c38] font-bold uppercase border-2 border-[#b85c38] px-8 py-3">
-                  <Skull className="w-4 h-4" />
+                <button 
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-2 text-[#b85c38] font-bold uppercase border-2 border-[#b85c38] px-10 py-4 hover:bg-[#b85c38] hover:text-[#1a120b] transition-all"
+                >
+                  <Skull className="w-5 h-5" aria-hidden="true" />
                   Client Portal
                 </button>
               </SignInButton>
             )}
-
           </motion.div>
         )}
       </AnimatePresence>

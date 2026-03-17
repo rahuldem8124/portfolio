@@ -37,7 +37,7 @@ export default function Services() {
 
   return (
     <section className="py-24 bg-[#f5f5f5] relative overflow-hidden border-t border-black/5">
-      {/* Vintage film grain overlay */}
+      {/* ✅ PERFORMANCE: Uses local WebP asset instead of external URL */}
       <div className="old-film-overlay opacity-10 absolute inset-0 pointer-events-none" />
       
       <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -45,7 +45,7 @@ export default function Services() {
           <h2 className="text-6xl font-black font-serif italic text-black mb-4 uppercase tracking-tighter">
             — Expertise & Bounties —
           </h2>
-          <p className="text-gray-600 font-serif italic max-w-2xl mx-auto">
+          <p className="text-gray-700 font-serif italic max-w-2xl mx-auto text-lg">
             Specialized solutions across engineering and creative domains to help your business scale the frontier.
           </p>
         </div>
@@ -56,40 +56,44 @@ export default function Services() {
               key={i}
               whileHover={{ rotate: [0, -1, 1, 0], y: -8 }}
               className="p-6 bg-[#e8e2d5] border border-black/10 shadow-2xl relative group cursor-pointer"
-              style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/paper-fibers.png')" }}
+              /* ✅ PERFORMANCE: Pointing to your local optimized folder */
+              style={{ backgroundImage: "url('/patterns/paper-fibers.webp')" }}
             >
-              <Link href={s.link} className="block">
+              <Link 
+                href={s.link} 
+                className="block"
+                aria-label={`Learn more about our ${s.title} service`}
+              >
                 {/* Wanted Header */}
                 <div className="text-center border-b-2 border-black/20 pb-4 mb-6">
                   <h3 className="text-3xl font-black text-black uppercase tracking-tight">SERVICE</h3>
                   <p className="text-[9px] font-bold tracking-[0.3em] text-black/60 uppercase">NOTHING Specialized</p>
                 </div>
 
-                {/* Icon Area (Acts as the "Photo") */}
+                {/* Icon Area */}
                 <div className="relative aspect-square mb-6 overflow-hidden bg-black flex items-center justify-center text-[#b85c38]">
                   <div className="relative z-10 scale-[2] grayscale brightness-125 group-hover:grayscale-0 transition-all duration-500">
                     {s.icon}
                   </div>
-                  {/* Vintage Vignette */}
-                  <div className="absolute inset-0 shadow-[inset_0_0_60px_rgba(0,0,0,0.8)] z-20" />
+                  <div className="absolute inset-0 shadow-[inset_0_0_60px_rgba(0,0,0,0.8)] z-20" aria-hidden="true" />
                 </div>
 
                 {/* Details */}
                 <div className="text-center">
                   <h3 className="text-xl font-black font-serif italic text-black mb-2 uppercase">{s.title}</h3>
-                  <p className="text-gray-700 text-xs font-serif italic leading-relaxed mb-6 px-2">
+                  <p className="text-gray-800 text-sm font-serif italic leading-relaxed mb-6 px-2">
                     "{s.desc}"
                   </p>
                   
-                  {/* Bounty Style Button */}
-                  <div className="bg-[#2b1d15] text-[#f5f5f5] py-3 font-black text-sm tracking-widest group-hover:bg-[#b85c38] transition-colors duration-300">
+                  {/* ✅ CONTRAST: Background and Hover colors adjusted for readability */}
+                  <div className="bg-[#2b1d15] text-[#f5f5f5] py-3 font-black text-sm tracking-widest group-hover:bg-[#a04a28] transition-colors duration-300">
                     {s.bounty}
                   </div>
                 </div>
 
                 {/* Arrow indicator */}
                 <div className="absolute top-2 right-2 opacity-20 group-hover:opacity-100 transition-opacity">
-                  <ArrowUpRight className="w-4 h-4 text-black" />
+                  <ArrowUpRight className="w-4 h-4 text-black" aria-hidden="true" />
                 </div>
               </Link>
             </motion.div>
