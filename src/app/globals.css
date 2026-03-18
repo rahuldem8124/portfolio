@@ -3,29 +3,48 @@
 @tailwind utilities;
 
 :root {
-  --background: #e5d3b3; 
-  --foreground: #2b1d15;
-  --accent: #b85c38;
+  --background: #1a120b; /* Espresso/Deep Brown */
+  --parchment: #e5d3b3;  /* Cream/Parchment */
+  --accent: #b85c38;     /* Rust Orange */
+  --gold: #f1c40f;       /* Frontier Gold */
 }
 
-/* 🔫 UNIVERSAL REVOLVER CURSOR */
-html, body, * {
-  cursor: url('/revolver.png') 16 16, auto !important;
+/* 🔫 UNIVERSAL REVOLVER CURSOR 
+   Added 'pointer' fallback for interactive elements to ensure UX isn't broken */
+html, body {
+  cursor: url('/revolver.png') 16 16, auto;
+  scroll-behavior: smooth;
+}
+
+/* Ensure buttons and links still feel clickable */
+a, button, [role="button"], .cl-userButtonTrigger {
+  cursor: pointer !important;
 }
 
 body {
   background-color: var(--background);
-  /* ✅ CHANGED: Pointing to local optimized asset */
+  /* ✅ PERFORMANCE: Using your local optimized WebP */
   background-image: url("/patterns/natural-paper.webp");
-  color: var(--foreground);
+  background-attachment: fixed;
+  color: var(--parchment);
   font-family: 'Courier New', Courier, monospace;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Enhanced Flickering Projector */
+/* 🖋️ BRANDED TEXT SELECTION */
+::selection {
+  background-color: var(--accent);
+  color: var(--background);
+}
+
+/* 🎥 ENHANCED FLICKERING PROJECTOR
+   Reduced opacity slightly for better readability of text beneath the stardust */
 @keyframes flicker {
-  0% { opacity: 0.25; filter: contrast(100%) sepia(50%); }
-  5% { opacity: 0.35; filter: contrast(110%) sepia(60%); }
-  100% { opacity: 0.25; }
+  0% { opacity: 0.15; filter: contrast(100%) sepia(30%); }
+  5% { opacity: 0.22; filter: contrast(115%) sepia(40%); }
+  10% { opacity: 0.18; }
+  100% { opacity: 0.15; }
 }
 
 .old-film-overlay {
@@ -34,14 +53,36 @@ body {
   pointer-events: none;
   z-index: 40;
   background: 
-    radial-gradient(circle, transparent 20%, rgba(43, 29, 21, 0.5) 100%),
-    /* ✅ CHANGED: Pointing to local optimized asset */
+    radial-gradient(circle, transparent 30%, rgba(26, 18, 11, 0.7) 100%),
+    /* ✅ PERFORMANCE: Using your local optimized WebP */
     url('/patterns/stardust.webp');
   mix-blend-mode: multiply;
-  animation: flicker 0.1s infinite;
+  animation: flicker 0.15s infinite italic;
+  opacity: 0.2;
 }
 
-/* Custom Scrollbar to look like Wood/Rust */
-::-webkit-scrollbar { width: 10px; }
-::-webkit-scrollbar-track { background: #1a120b; }
-::-webkit-scrollbar-thumb { background: #b85c38; border-radius: 0px; }
+/* 🪵 CUSTOM SCROLLBAR (Wood & Rust) */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+  border-left: 1px solid rgba(184, 92, 56, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border: 3px solid var(--background);
+  border-radius: 0px; /* Sharp outlaw edges */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a04a28; /* Slightly darker rust on hover */
+}
+
+/* 🧩 HELPER: High-Stakes Border Style */
+.frontier-border {
+  border: 2px solid var(--accent);
+  box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.4);
+}

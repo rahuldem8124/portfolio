@@ -15,7 +15,7 @@ export default function Navbar() {
   const { isLoaded, isSignedIn } = useAuth();
   const { user } = useUser();
 
-  // Admin Check
+  // Admin Check: Securely gated via your primary email
   const isAdmin = user?.primaryEmailAddress?.emailAddress === "rahulan23aml@srishakthi.ac.in";
 
   useEffect(() => {
@@ -45,7 +45,7 @@ export default function Navbar() {
       >
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
 
-          {/* LOGO - Added aria-label for SEO/Accessibility */}
+          {/* LOGO: Optimized for screen readers */}
           <Link href="/" className="flex items-center gap-3 group" aria-label="Outlaw Code Home">
             <div className="relative p-2 bg-[#b85c38] rounded-full border-2 border-[#e5d3b3] group-hover:rotate-12 transition-transform duration-300">
               <Star className="w-6 h-6 text-[#1a120b] fill-current" aria-hidden="true" />
@@ -60,7 +60,7 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* DESKTOP MENU */}
+          {/* DESKTOP MENU: High-contrast hover effects */}
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link, i) => (
               <Link
@@ -75,31 +75,25 @@ export default function Navbar() {
               </Link>
             ))}
 
-            {/* DASHBOARD LINKS */}
+            {/* PROTECTED LINKS: Dynamic dashboard routing */}
             {isLoaded && isSignedIn && (
               <div className="flex items-center gap-6">
-                {isAdmin ? (
-                  <Link 
-                    href="/dashboard" 
-                    className="flex items-center gap-2 text-[#b85c38] hover:text-[#e5d3b3] text-xs font-black uppercase tracking-tighter transition-colors"
-                  >
+                <Link 
+                  href={isAdmin ? "/dashboard" : "/members"} 
+                  className="flex items-center gap-2 text-[#b85c38] hover:text-[#e5d3b3] text-xs font-black uppercase tracking-tighter transition-colors"
+                >
+                  {isAdmin ? (
                     <ShieldCheck className="w-4 h-4" aria-hidden="true" />
-                    Admin Panel
-                  </Link>
-                ) : (
-                  <Link 
-                    href="/members" 
-                    className="flex items-center gap-2 text-[#e5d3b3]/70 hover:text-[#e5d3b3] text-xs font-black uppercase tracking-tighter transition-colors"
-                  >
+                  ) : (
                     <Users className="w-4 h-4" aria-hidden="true" />
-                    The Posse
-                  </Link>
-                )}
-                <UserButton />
+                  )}
+                  {isAdmin ? "Admin Panel" : "The Posse"}
+                </Link>
+                <UserButton appearance={{ elements: { userButtonAvatarBox: "border-2 border-[#b85c38]" } }} />
               </div>
             )}
 
-            {/* AUTH BUTTON */}
+            {/* AUTH BUTTON: Visible only to newcomers */}
             {isLoaded && !isSignedIn && (
               <SignInButton mode="modal" fallbackRedirectUrl="/members">
                 <button className="px-6 py-2 bg-[#b85c38] text-[#1a120b] font-black uppercase tracking-widest text-xs border-2 border-[#e5d3b3] hover:bg-[#e5d3b3] hover:text-[#b85c38] transition-all focus:ring-2 focus:ring-[#b85c38] outline-none">
@@ -109,7 +103,7 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* MOBILE MENU BUTTON - Optimized for Accessibility Score */}
+          {/* MOBILE MENU TOGGLE: Accessibility First */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={mobileOpen ? "Close main menu" : "Open main menu"}
@@ -125,14 +119,14 @@ export default function Navbar() {
         </div>
       </motion.nav>
 
-      {/* MOBILE MENU */}
+      {/* MOBILE DRAWER: Animated presence for "The Saloon" feel */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-40 bg-[#1a120b] pt-24 px-6 md:hidden flex flex-col items-center gap-8"
+            className="fixed inset-0 z-40 bg-[#1a120b] pt-32 px-6 md:hidden flex flex-col items-center gap-8"
           >
             {navLinks.map((link, i) => (
               <Link
@@ -146,7 +140,7 @@ export default function Navbar() {
             ))}
 
             {isLoaded && isSignedIn && (
-              <>
+              <div className="flex flex-col items-center gap-6">
                 <Link 
                   href={isAdmin ? "/dashboard" : "/members"} 
                   onClick={() => setMobileOpen(false)}
@@ -155,17 +149,15 @@ export default function Navbar() {
                   {isAdmin ? <ShieldCheck aria-hidden="true" /> : <Users aria-hidden="true" />}
                   {isAdmin ? "Admin Console" : "Member Area"}
                 </Link>
-                <div className="mt-4">
-                  <UserButton appearance={{ elements: { userButtonAvatarBox: "w-14 h-14" } }} />
-                </div>
-              </>
+                <UserButton appearance={{ elements: { userButtonAvatarBox: "w-16 h-16 border-2 border-[#b85c38]" } }} />
+              </div>
             )}
 
             {!isSignedIn && (
               <SignInButton mode="modal" fallbackRedirectUrl="/members">
                 <button 
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-2 text-[#b85c38] font-bold uppercase border-2 border-[#b85c38] px-10 py-4 hover:bg-[#b85c38] hover:text-[#1a120b] transition-all"
+                  className="flex items-center gap-2 text-[#b85c38] font-bold uppercase border-2 border-[#b85c38] px-12 py-4 hover:bg-[#b85c38] hover:text-[#1a120b] transition-all"
                 >
                   <Skull className="w-5 h-5" aria-hidden="true" />
                   Client Portal
