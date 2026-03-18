@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { PrismaClient } from "@prisma/client";
 import Link from "next/link";
-import { Shield, MessageSquare, Inbox, Activity, Users } from "lucide-react";
+import { Shield, MessageSquare, Inbox, Users, LogOut } from "lucide-react";
 import AdminResponseForm from "@/components/AdminResponseForm";
 
 const prisma = new PrismaClient();
@@ -11,7 +11,7 @@ export default async function AdminDashboard() {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
 
-  // Verify Admin Status from DB
+  // Verify Admin Status
   const dbUser = await prisma.user.findUnique({ 
     where: { clerkId: userId },
     select: { role: true, email: true }
@@ -19,99 +19,117 @@ export default async function AdminDashboard() {
 
   if (dbUser?.role !== "ADMIN") redirect("/members");
 
-  // Fetch all project requests with user details
+  // Fetch requests
   const allRequests = await prisma.projectRequest.findMany({
     include: { user: true },
     orderBy: { createdAt: "desc" },
   });
 
-  // Calculate Quick Stats
   const pendingCount = allRequests.filter(r => r.status === "PENDING").length;
   const totalUsers = await prisma.user.count();
 
   return (
-    <main className="min-h-screen bg-[#020617] text-slate-200 p-8">
-      <div className="max-w-6xl mx-auto">
+    // ✅ THEME FIXED: Espresso background + Paper Texture
+    <main className="min-h-screen bg-[#1a120b] text-[#e5d3b3] font-serif p-8 relative overflow-hidden">
+      <div 
+        className="absolute inset-0 opacity-5 pointer-events-none" 
+        style={{ backgroundImage: "url('/patterns/natural-paper.webp')" }} 
+      />
+
+      <div className="max-w-6xl mx-auto relative z-10">
         
         {/* HEADER SECTION */}
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-slate-800 pb-8 mb-10 gap-6">
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-end border-b-4 border-[#2b1d15] pb-8 mb-10 gap-6">
           <div>
-            <h1 className="text-4xl font-black text-blue-500 flex items-center gap-3">
-              <Shield className="w-8 h-8" /> COMMAND CENTER
+            {/* ✅ THEME FIXED: Blue -> Rust Orange */}
+            <h1 className="text-5xl font-black text-[#b85c38] flex items-center gap-3 tracking-tighter italic uppercase">
+              <Shield className="w-10 h-10" /> Command Center
             </h1>
-            <p className="text-slate-500 mt-2 font-mono text-sm uppercase tracking-widest">
-              Admin: {dbUser.email} • System Online
+            <p className="text-[#e5d3b3]/40 mt-2 font-mono text-xs uppercase tracking-[0.3em]">
+              Log: {dbUser.email} • Frontier Operational
             </p>
           </div>
           
           <div className="flex gap-4">
-            <div className="bg-slate-900/80 border border-slate-800 p-3 rounded-xl min-w-[100px] text-center">
-              <p className="text-[10px] text-slate-500 font-bold uppercase">Pending</p>
-              <p className="text-xl font-black text-amber-500">{pendingCount}</p>
+            {/* Stats Cards: Wood style */}
+            <div className="bg-[#2b1d15] border-2 border-[#b85c38]/30 p-4 rounded-none min-w-[120px] text-center shadow-[6px_6px_0px_rgba(0,0,0,0.3)]">
+              <p className="text-[10px] text-[#e5d3b3]/60 font-bold uppercase tracking-widest mb-1">Pending</p>
+              <p className="text-3xl font-black text-[#f1c40f]">{pendingCount}</p>
             </div>
-            <div className="bg-slate-900/80 border border-slate-800 p-3 rounded-xl min-w-[100px] text-center">
-              <p className="text-[10px] text-slate-500 font-bold uppercase">Posse Size</p>
-              <p className="text-xl font-black text-blue-400">{totalUsers}</p>
+            <div className="bg-[#2b1d15] border-2 border-[#b85c38]/30 p-4 rounded-none min-w-[120px] text-center shadow-[6px_6px_0px_rgba(0,0,0,0.3)]">
+              <p className="text-[10px] text-[#e5d3b3]/60 font-bold uppercase tracking-widest mb-1">Posse</p>
+              <p className="text-3xl font-black text-[#e5d3b3]">{totalUsers}</p>
             </div>
-            <Link href="/" className="flex items-center text-xs font-bold text-slate-500 hover:text-white transition-all uppercase tracking-widest border border-slate-800 px-4 py-2 rounded h-fit">
-              Exit
+            <Link href="/" className="flex items-center text-xs font-black text-[#1a120b] bg-[#e5d3b3] hover:bg-[#b85c38] transition-all uppercase tracking-widest px-6 py-2 rounded-none h-fit self-end">
+              <LogOut className="w-4 h-4 mr-2" /> Exit
             </Link>
           </div>
         </header>
 
         {/* REQUESTS SECTION */}
-        <section className="grid gap-8">
+        <section className="grid gap-10">
           <div className="flex items-center gap-4">
-            <h2 className="text-xl font-bold flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-blue-400" /> Incoming Dispatches
+            <h2 className="text-2xl font-black uppercase italic flex items-center gap-3">
+              <MessageSquare className="w-6 h-6 text-[#b85c38]" /> Incoming Dispatches
             </h2>
-            <div className="h-px flex-1 bg-slate-800" />
+            <div className="h-1 flex-1 bg-[#2b1d15]" />
           </div>
           
           {allRequests.length === 0 ? (
-            <div className="p-20 text-center border-2 border-dashed border-slate-800 rounded-3xl text-slate-600">
-              <Inbox className="w-12 h-12 mx-auto mb-4 opacity-20" />
-              <p className="uppercase tracking-widest text-sm">No requests in the chamber yet.</p>
+            <div className="p-20 text-center border-4 border-dashed border-[#2b1d15] text-[#e5d3b3]/20">
+              <Inbox className="w-16 h-16 mx-auto mb-4 opacity-10" />
+              <p className="uppercase tracking-[0.4em] text-sm">No dispatches in the chamber.</p>
             </div>
           ) : (
-            <div className="grid gap-6">
+            <div className="grid gap-10">
               {allRequests.map((req) => (
-                <div key={req.id} className="bg-slate-900/40 border border-slate-800 rounded-3xl p-8 backdrop-blur-md hover:border-blue-500/30 transition-all group">
-                  <div className="flex justify-between items-start mb-6">
+                <div 
+                  key={req.id} 
+                  // ✅ THEME FIXED: Dark Blue -> Paper Fiber texture
+                  className="bg-[#2b1d15]/80 border-2 border-[#3d2b1f] rounded-none p-8 md:p-10 shadow-[10px_10px_0px_rgba(0,0,0,0.4)] relative overflow-hidden group transition-all hover:translate-x-1 hover:translate-y-1 hover:shadow-none"
+                  style={{ backgroundImage: "url('/patterns/paper-fibers.webp')" }}
+                >
+                  <div className="flex flex-col md:flex-row justify-between items-start mb-8 gap-4">
                     <div>
-                      <div className="flex items-center gap-3 mb-2">
-                         <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase border ${
-                            req.status === 'PENDING' ? 'bg-amber-900/20 text-amber-500 border-amber-500/30' : 
-                            req.status === 'IN_PROGRESS' ? 'bg-blue-900/20 text-blue-400 border-blue-400/30' :
-                            'bg-green-900/20 text-green-400 border-green-400/30'
+                      <div className="flex items-center gap-4 mb-4">
+                         <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-widest border-2 ${
+                            req.status === 'PENDING' ? 'bg-[#f1c40f]/10 text-[#f1c40f] border-[#f1c40f]/50' : 
+                            req.status === 'IN_PROGRESS' ? 'bg-[#b85c38]/10 text-[#b85c38] border-[#b85c38]/50' :
+                            'bg-green-900/10 text-green-500 border-green-500/50'
                           }`}>
                             {req.status}
                           </span>
-                          <span className="text-[10px] font-mono text-slate-600">ID: {req.id.slice(-6)}</span>
+                          <span className="text-[10px] font-mono text-[#e5d3b3]/30">REF: {req.id.slice(-8).toUpperCase()}</span>
                       </div>
-                      <h3 className="text-2xl font-bold group-hover:text-blue-400 transition-colors">{req.title}</h3>
-                      <div className="flex items-center gap-2 mt-2">
-                        <Users className="w-3 h-3 text-slate-500" />
-                        <span className="text-xs font-bold text-slate-400 uppercase tracking-tighter">
-                          {req.user.name || "Outlaw"} • {req.user.email}
+                      <h3 className="text-3xl md:text-4xl font-black uppercase italic text-[#e5d3b3] leading-none group-hover:text-[#b85c38] transition-colors">
+                        {req.title}
+                      </h3>
+                      <div className="flex items-center gap-2 mt-4">
+                        <Users className="w-4 h-4 text-[#b85c38]" />
+                        <span className="text-xs font-bold text-[#e5d3b3]/60 uppercase tracking-widest">
+                          {req.user.name || "Anonymous Outlaw"} • {req.user.email}
                         </span>
                       </div>
                     </div>
                     
-                    <div className="text-right">
-                       <p className="text-[10px] font-bold text-slate-600 uppercase">Received</p>
-                       <p className="text-xs font-mono text-slate-400">{new Date(req.createdAt).toLocaleDateString()}</p>
+                    <div className="text-left md:text-right">
+                       <p className="text-[10px] font-black text-[#b85c38] uppercase tracking-tighter">Dispatch Received</p>
+                       <p className="text-sm font-mono text-[#e5d3b3]/80">{new Date(req.createdAt).toLocaleDateString()}</p>
                     </div>
                   </div>
 
-                  <p className="text-slate-400 text-sm leading-relaxed max-w-4xl">{req.description}</p>
+                  <p className="text-[#e5d3b3]/90 text-lg leading-relaxed max-w-4xl italic border-l-4 border-[#b85c38]/30 pl-6 mb-8">
+                    "{req.description}"
+                  </p>
                   
-                  {/* ✅ THE FUNCTIONAL RESPONSE FORM */}
-                  <AdminResponseForm 
-                    requestId={req.id} 
-                    currentStatus={req.status} 
-                    currentNotes={req.adminNotes} 
-                  />
+                  {/* Action Form: Ensure this component also matches the theme inside */}
+                  <div className="mt-8 border-t-2 border-[#1a120b] pt-8">
+                    <AdminResponseForm 
+                      requestId={req.id} 
+                      currentStatus={req.status} 
+                      currentNotes={req.adminNotes} 
+                    />
+                  </div>
                 </div>
               ))}
             </div>
