@@ -13,16 +13,18 @@ export const metadata: Metadata = {
     "Digital Bounty Hunter Portfolio"
   ],
   alternates: {
-    canonical: "https://portfolio-rahul-an.vercel.app/",
+    // ✅ Updated to new URL
+    canonical: "https://outlawcode.vercel.app/",
   },
   openGraph: {
     title: "Outlaw Code | High-Performance Web & AI Solutions",
     description: "Architecting high-stakes digital outposts and outperforming platforms.",
-    url: "https://portfolio-rahul-an.vercel.app/",
+    // ✅ Updated to new URL
+    url: "https://outlawcode.vercel.app/",
     siteName: "Outlaw Code",
     images: [
       {
-        url: "/og-image.png", // Ensure this exists in your public folder
+        url: "/og-image.png", 
         width: 1200,
         height: 630,
         alt: "Outlaw Code Agency Frontier",
@@ -40,9 +42,11 @@ export default function Home() {
       {
         "@type": "ProfessionalService",
         "name": "Outlaw Code",
-        "image": "https://portfolio-rahul-an.vercel.app/og-image.png",
+        // ✅ Updated to new URL
+        "image": "https://outlawcode.vercel.app/og-image.png",
         "description": "Premium freelance software engineering specializing in Next.js, AI, and NLP automation.",
-        "url": "https://portfolio-rahul-an.vercel.app/",
+        // ✅ Updated to new URL
+        "url": "https://outlawcode.vercel.app/",
         "priceRange": "$$$",
         "address": {
           "@type": "PostalAddress",
@@ -60,7 +64,8 @@ export default function Home() {
       {
         "@type": "Person",
         "name": "Rahul",
-        "url": "https://portfolio-rahul-an.vercel.app/",
+        // ✅ Updated to new URL
+        "url": "https://outlawcode.vercel.app/",
         "jobTitle": "Lead Software Engineer",
         "sameAs": [
           "https://github.com/rahul-an",

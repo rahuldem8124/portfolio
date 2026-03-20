@@ -1,12 +1,14 @@
 import { MetadataRoute } from 'next'
 
 export default function robots(): MetadataRoute.Robots {
+  const baseUrl = 'https://outlawcode.vercel.app'
+
   return {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/admin', '/api'], // Keep your Command Center private
+      disallow: ['/dashboard', '/admin', '/sign-in', '/sign-up'], // Keep the "Command Center" private
     },
-    sitemap: 'https://portfolio-rahul-an.vercel.app/sitemap.xml',
+    sitemap: `${baseUrl}/sitemap.xml`,
   }
 }
